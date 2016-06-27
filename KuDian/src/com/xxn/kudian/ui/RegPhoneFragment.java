@@ -1,0 +1,479 @@
+package com.xxn.kudian.ui;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.controller.UMServiceFactory;
+import com.umeng.socialize.controller.UMSocialService;
+import com.umeng.socialize.controller.listener.SocializeListeners.UMAuthListener;
+import com.umeng.socialize.controller.listener.SocializeListeners.UMDataListener;
+import com.umeng.socialize.exception.SocializeException;
+import com.umeng.socialize.sso.SinaSsoHandler;
+import com.umeng.socialize.sso.UMQQSsoHandler;
+import com.umeng.socialize.weixin.controller.UMWXHandler;
+import com.xxn.kudian.R;
+import com.xxn.kudian.base.BaseApplication;
+import com.xxn.kudian.base.BaseV4Fragment;
+import com.xxn.kudian.config.Constants.WeChatConfig;
+import com.xxn.kudian.customwidget.MyAlertDialog;
+import com.xxn.kudian.table.UserTable;
+import com.xxn.kudian.utils.AsyncHttpClientTool;
+import com.xxn.kudian.utils.CommonTools;
+import com.xxn.kudian.utils.DateTimeTools;
+import com.xxn.kudian.utils.JsonTool;
+import com.xxn.kudian.utils.LogTool;
+import com.xxn.kudian.utils.SIMCardInfo;
+import com.xxn.kudian.utils.ToastTool;
+import com.xxn.kudian.utils.UserPreference;
+
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+/** 
+ * 类描述 ：注册——电话和验证码页面
+ * 类名： RegPhoneFragment.java  
+ * Copyright:   Copyright (c)2015    
+ * Company:     zhangshuai   
+ * @author:     zhangshuai    
+ * @version:    1.0    
+ * 创建时间:    2015-8-10 下午4:05:26  
+*/
+public class RegPhoneFragment extends BaseV4Fragment {
+	/*************Views************/
+	private View rootView;// 根View
+	private View leftImageButton;// 导航栏左侧按钮
+	private View rightImageButton;// 导航栏右侧按钮
+
+	private EditText mPhoneView;// 手机号
+	private UserPreference userPreference;
+	private TextView leftNavigation;// 步骤
+	private ImageView loginwechat;
+	private Button authCodeButton;
+	private String mPhone;
+
+	View focusView = null;
+	UMSocialService mController = UMServiceFactory.getUMSocialService("com.umeng.login");
+
+	private ProgressDialog dialog;
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		rootView = inflater.inflate(R.layout.fragment_reg_phone, container, false);
+		userPreference = BaseApplication.getInstance().getUserPreference();
+
+		findViewById();// 初始化views
+		initView();
+		// 添加微信平台
+//		UMWXHandler wxHandler = new UMWXHandler(getActivity(), WeChatConfig.API_KEY, WeChatConfig.SECRIT_KEY);
+//		wxHandler.addToSocialSDK();
+
+		return rootView;
+	}
+
+	@Override
+	protected void findViewById() {
+		leftImageButton = (View) getActivity().findViewById(R.id.left_btn_bg);
+//		rightImageButton = (View) getActivity().findViewById(R.id.right_btn_bg);
+		mPhoneView = (EditText) rootView.findViewById(R.id.phone);
+		leftNavigation = (TextView) getActivity().findViewById(R.id.nav_text);
+		loginwechat = (ImageView) rootView.findViewById(R.id.loginwechat);
+		authCodeButton = (Button) rootView.findViewById(R.id.get_authcode);
+	}
+
+	@Override
+	protected void initView() {
+		rightImageButton.setVisibility(View.GONE);
+		// 显示用户手机号
+		String loginedPhone = userPreference.getU_tel();
+
+		if (!TextUtils.isEmpty(loginedPhone)) {
+			mPhoneView.setText(loginedPhone);
+		} else {
+			SIMCardInfo siminfo = new SIMCardInfo(getActivity());
+			String number = siminfo.getNativePhoneNumber();
+			mPhoneView.setText(number);
+		}
+
+//		leftNavigation.setText("注册 1/2");
+		leftImageButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				vertifyToTerminate();
+			}
+		});
+
+		authCodeButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				attepmtPhone();
+			}
+		});
+
+		loginwechat.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				ToastTool.showShort(getActivity(), "微信第三方登录");
+				mController.doOauthVerify(getActivity(), SHARE_MEDIA.WEIXIN, new UMAuthListener() {
+					@Override
+					public void onStart(SHARE_MEDIA platform) {
+						dialog = new ProgressDialog(getActivity());
+						dialog.setMessage("正在登录...");
+						dialog.show();
+						dialog.setCancelable(false);
+//						Toast.makeText(getActivity(), "授权开始", Toast.LENGTH_SHORT).show();
+					}
+
+					@Override
+					public void onError(SocializeException e, SHARE_MEDIA platform) {
+						dialog.dismiss();
+//						Toast.makeText(getActivity(), "授权错误", Toast.LENGTH_SHORT).show();
+					}
+
+					@Override
+					public void onComplete(final Bundle value, SHARE_MEDIA platform) {
+//						Toast.makeText(getActivity(), "授权完成", Toast.LENGTH_SHORT).show();
+						// 获取相关授权信息
+						mController.getPlatformInfo(getActivity(), SHARE_MEDIA.WEIXIN, new UMDataListener() {
+							@Override
+							public void onStart() {
+//								Toast.makeText(getActivity(), "获取平台数据开始...", Toast.LENGTH_SHORT).show();
+							}
+
+							@Override
+							public void onComplete(int status, Map<String, Object> info) {
+								if (status == 200 && info != null) {
+									StringBuilder sb = new StringBuilder();
+									Set<String> keys = info.keySet();
+									for (String key : keys) {
+										sb.append(key + "=" + info.get(key).toString() + "\r\n");
+									}
+									String avatar = info.get("headimgurl").toString();
+									String nickname = info.get("nickname").toString();
+									other_login("wx", value.getString("uid"), avatar, nickname);
+									Log.d("TestData", sb.toString());
+								} else {
+									dialog.dismiss();
+									Log.d("TestData", "发生错误：" + status);
+								}
+							}
+						});
+					}
+
+					@Override
+					public void onCancel(SHARE_MEDIA platform) {
+						dialog.dismiss();
+//						Toast.makeText(getActivity(), "授权取消", Toast.LENGTH_SHORT).show();
+					}
+				});
+			}
+		});
+
+	}
+
+	/**
+	 * 确认终止注册
+	 */
+	private void vertifyToTerminate() {
+		final MyAlertDialog dialog = new MyAlertDialog(getActivity());
+		dialog.setTitle("提示");
+		dialog.setMessage("注册过程中退出，信息将不能保存。是否继续退出？");
+		View.OnClickListener comfirm = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				dialog.dismiss();
+				getActivity().finish();
+			}
+		};
+		View.OnClickListener cancle = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				dialog.dismiss();
+			}
+		};
+		dialog.setPositiveButton("确定", comfirm);
+		dialog.setNegativeButton("取消", cancle);
+		dialog.show();
+	}
+
+	/**
+	 * 验证输入
+	 */
+	private void attepmtPhone() {
+		// 重置错误
+		mPhoneView.setError(null);
+
+		// 存储用户值
+		mPhone = mPhoneView.getText().toString();
+		boolean cancel = false;
+
+		// 检查手机号
+		if (TextUtils.isEmpty(mPhone)) {
+			mPhoneView.setError(getString(R.string.error_field_required));
+			focusView = mPhoneView;
+			cancel = true;
+		} else if (!CommonTools.isMobileNO(mPhone)) {
+			mPhoneView.setError(getString(R.string.error_phone));
+			focusView = mPhoneView;
+			cancel = true;
+		}
+
+		if (cancel) {
+			// 如果错误，则提示错误
+			focusView.requestFocus();
+		} else {
+			userPreference.setU_tel(mPhone);
+			getAuthCode();
+		}
+	}
+
+	/**
+	 * 下一步
+	 */
+	private void next() {
+//		RegAccountFragment regSchoolFragment = new RegAccountFragment();
+//		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//		transaction.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out, R.anim.push_right_in, R.anim.push_right_out);
+//		transaction.replace(R.id.fragment_container, regSchoolFragment, "RegAccountFragment");
+//		transaction.addToBackStack(null);
+//		transaction.commit();
+	}
+
+	/**
+	 * 获取验证码
+	 * @return
+	 */
+	private void getAuthCode() {
+		RequestParams params = new RequestParams();
+		params.put(UserTable.U_TEL, mPhone);
+		params.put("type", 0);
+		TextHttpResponseHandler responseHandler = new TextHttpResponseHandler() {
+
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, String response) {
+				// TODO Auto-generated method stub
+				JsonTool jsonTool = new JsonTool(response);
+				String status = jsonTool.getStatus();
+				LogTool.i("短信验证码==" + status + response);
+				if (status.equals(JsonTool.STATUS_SUCCESS)) {
+					LogTool.i(jsonTool.getMessage());
+					next();
+				} else if (status.equals(JsonTool.STATUS_FAIL)) {
+					boolean cancel = false;
+					mPhoneView.setError(jsonTool.getMessage());
+					focusView = mPhoneView;
+					cancel = true;
+					if (cancel) {
+						focusView.requestFocus();
+						authCodeButton.setText("获取验证码");
+						authCodeButton.setEnabled(true);
+					}
+				}
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable e) {
+				// TODO Auto-generated method stub
+				LogTool.e("服务器错误,错误代码" + statusCode + "，  原因：" + errorResponse);
+
+				boolean cancel = false;
+				if (statusCode != 0) {
+					JsonTool jsonTool = new JsonTool(errorResponse);
+					if (jsonTool.getStatus().equals("fail")) {
+						mPhoneView.setError(jsonTool.getMessage());
+						focusView = mPhoneView;
+						cancel = true;
+					}
+				}
+				if (cancel) {
+					focusView.requestFocus();
+					authCodeButton.setText("获取验证码");
+					authCodeButton.setEnabled(true);
+				}
+			}
+		};
+		AsyncHttpClientTool.post("api/sms/send", params, responseHandler);
+	}
+
+	/**
+	 * // 第三方登录
+	 */
+	private void other_login(String source, String source_id, String avatar, String nickname) {
+
+		RequestParams params = new RequestParams();
+		params.put("source", source);
+		params.put("source_id", source_id);
+		params.put("avatar", avatar);
+		params.put("nickname", nickname);
+		TextHttpResponseHandler responseHandler = new TextHttpResponseHandler() {
+
+			@Override
+			public void onStart() {
+				// TODO Auto-generated method stub
+				super.onStart();
+			}
+
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, String response) {
+				// TODO Auto-generated method stub
+				LogTool.i(statusCode + "===" + response);
+				try {
+					dialog.dismiss();
+					JsonTool jsonTool = new JsonTool(response);
+					JSONObject jsonObject = jsonTool.getJsonObject();
+
+					String status = jsonTool.getStatus();
+					String message = jsonTool.getMessage();
+					if (status.equals("success")) {
+						jsonTool.saveAccess_token();
+						// 登录成功后获取用户信息
+						getUserInfo(jsonObject.getString("user_id"));
+						LogTool.i(message);
+					} else {
+						LogTool.e(message);
+					}
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable e) {
+				// TODO Auto-generated method stub
+				LogTool.e("服务器错误aaa" + errorResponse);
+			}
+		};
+		AsyncHttpClientTool.post("/api/user/thirdparty", params, responseHandler);
+	}
+
+	// 获取某个用户信息
+	private void getUserInfo(String userid) {
+
+		RequestParams params = new RequestParams();
+		params.put(UserTable.U_ID, userid);
+
+		TextHttpResponseHandler responseHandler = new TextHttpResponseHandler() {
+
+			@Override
+			public void onStart() {
+				// TODO Auto-generated method stub
+				super.onStart();
+			}
+
+			@Override
+			public void onFinish() {
+				// TODO Auto-generated method stub
+				super.onFinish();
+			}
+
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, String response) {
+				// TODO Auto-generated method stub
+				LogTool.i(statusCode + "===" + response);
+				JsonTool jsonTool = new JsonTool(response);
+				JSONObject jsonObject = jsonTool.getJsonObject();
+
+				String status = jsonTool.getStatus();
+				if (status.equals("success")) {
+					saveUser(jsonObject);
+				} else {
+					// LogTool.e(user_info);
+				}
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable e) {
+				// TODO Auto-generated method stub
+				LogTool.e("服务器错误" + errorResponse);
+			}
+		};
+		AsyncHttpClientTool.post("api/user/user", params, responseHandler);
+
+	}
+
+	/**
+	 * 存储自己的信息
+	 */
+	private void saveUser(final JSONObject jsonUserObject) {
+		// TODO Auto-generated method stub
+		userPreference.setUserLogin(true);
+
+		try {
+			String userInfo = jsonUserObject.getString("user_info");
+			JSONObject userInfoJsonObject = new JSONObject(userInfo);
+
+			String nickname = userInfoJsonObject.getString(UserTable.U_NICKNAME);
+			String avatar = userInfoJsonObject.getString(UserTable.AVATAR);
+			String create_time = userInfoJsonObject.getString(UserTable.U_CREATE_TIME);
+			Date date = DateTimeTools.StringToDate(create_time);
+
+			String userid = userInfoJsonObject.getString(UserTable.U_ID);
+
+			// 取出频道相关信息
+			int article_count = jsonUserObject.getInt(UserTable.ARTICLE_COUNT);
+			int channel_count = jsonUserObject.getInt(UserTable.CHANNEL_COUNT);
+
+			userPreference.setU_nickname(nickname);
+			userPreference.setU_avatar(avatar);
+			userPreference.setU_CreatTime(date);
+			if (!userid.isEmpty()) {
+				userPreference.setU_id(Integer.parseInt(userid));
+			} else {
+				LogTool.e("存储用户信息的id有误" + userid);
+			}
+
+			userPreference.setArticle_count(article_count);
+			userPreference.setChannel_count(channel_count);
+			userPreference.printUserInfo();
+			startActivity(new Intent(getActivity(), MainActivity.class));
+			getActivity().finish();
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

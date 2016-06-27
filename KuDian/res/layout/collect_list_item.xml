@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/merchant_image"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="40dp"
+        android:src="@drawable/merchant_image1" />
+
+    <TextView
+        android:id="@+id/merchant_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/merchant_image"
+        android:layout_toRightOf="@+id/merchant_image"
+        android:text="商家名称"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/goods_quantity_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/merchant_image"
+        android:layout_alignLeft="@+id/merchant_address_text"
+        android:layout_marginBottom="5dp"
+        android:text="商品数量：" />
+
+    <TextView
+        android:id="@+id/merchant_address_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/goods_quantity"
+        android:layout_alignLeft="@+id/merchant_name"
+        android:text="地址：" />
+
+    <TextView
+        android:id="@+id/goods_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/goods_quantity_text"
+        android:layout_alignBottom="@+id/goods_quantity_text"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/goods_quantity_text"
+        android:text="200" />
+
+    <TextView
+        android:id="@+id/merchant_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/merchant_address_text"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/merchant_address_text"
+        android:text="厦门市思明区" />
+
+    <RelativeLayout
+        android:id="@+id/cancel_collect"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:padding="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/merchant_image" >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/collected_img" />
+    </RelativeLayout>
+
+</RelativeLayout>

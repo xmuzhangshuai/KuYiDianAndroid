@@ -1,0 +1,180 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/left_btn_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/navigation_height"
+        android:background="@color/blank_bg"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/sideslip_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:src="@drawable/sideslip_btn_black_img" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="5dp"
+            android:src="@drawable/kuyidian_logo" />
+
+        <ImageView
+            android:id="@+id/person_info_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:src="@drawable/person_info_black_img" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:id="@+id/ll_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:background="@color/transparent_background"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="附近商家"
+        android:textSize="15sp" />
+
+    <HorizontalScrollView
+        android:id="@+id/nearby_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0.7"
+        android:scrollbars="none" >
+
+        <LinearLayout
+            android:id="@+id/nearby"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/merchant"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/main_merchant_background"
+            android:drawableTop="@drawable/merchant_list_img"
+            android:paddingTop="15dp"
+            android:text="商家列表"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/new_goods"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/main_newgoods_background"
+            android:drawableTop="@drawable/new_goods_img"
+            android:paddingTop="15dp"
+            android:text="最新商品"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/main_map_background"
+            android:drawableTop="@drawable/map_img"
+            android:paddingTop="15dp"
+            android:text="地图"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/my_collect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/main_collect_background"
+            android:drawableTop="@drawable/main_collect_img"
+            android:paddingTop="15dp"
+            android:text="我的收藏"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/integral_board"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/main_integral_background"
+            android:drawableTop="@drawable/integralboard_img"
+            android:paddingTop="20dp"
+            android:text="排行榜"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/recommend"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@color/main_share_background"
+            android:drawableTop="@drawable/main_recommend_img"
+            android:paddingTop="15dp"
+            android:text="酷易点推荐"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</LinearLayout>
